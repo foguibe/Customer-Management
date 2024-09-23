@@ -1,0 +1,79 @@
+<div class="p-4">
+  <div class="flex justify-between mb-4">
+    <div>
+      <input [(ngModel)]="searchTerm" (ngModelChange)="filterCustomers()" class="p-2 border border-gray-400 rounded-[2px] text-[14px] outline-none" placeholder="Search..." />
+      <p class="text-[14px] text-gray-500 mt-1">Search by name, email, phone, or address.</p>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <p class="font-bold">Filter by: </p>
+      <select [(ngModel)]="filterGender" (ngModelChange)="filterCustomers()" class="p-2 border-[2px] border-gray-400 rounded-[2px] text-[14px] cursor-pointer">
+        <option value="" class="font-sans">All Genders</option>
+        <option value="male" class="font-sans">Male</option>
+        <option value="female" class="font-sans">Female</option>
+      </select>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <p class="font-bold">Date Added:</p>
+      <input type="date" [(ngModel)]="startDate" (ngModelChange)="filterCustomers()" class="p-2 border-[2px] border-gray-400 rounded-[2px] text-[14px] outline-none" />
+      <span>to</span>
+      <input type="date" [(ngModel)]="endDate" (ngModelChange)="filterCustomers()" class="p-2 border-[2px] border-gray-400 rounded-[2px] text-[14px] outline-none" />
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between"> <!-- This div was not properly closed before -->
+    <button (click)="clearFilters()" class="p-2 bg-red-700 text-white rounded-[2px] mr-2 text-[14px] font-bold">Clear Filters</button>
+    <button (click)="addCustomer()" class="p-2 bg-blue-900 text-white rounded-[2px] text-[14px] font-bold">Add Customer</button>
+  </div> <!-- Properly closing this div -->
+
+  <div class="mt-10 flex items-center gap-3 justify-center">
+    <img src="assets/logo.png" alt="Logo" width="30" height="30">
+    <h2 class="text-center font-bold text-[24px] text-gray-700">Customer Management Application</h2>
+  </div>
+
+  <p class="text-[15px]"><span class="font-bold">Total Customers:</span> {{filteredCustomers.length}}</p>
+
+  <table class="min-w-full table-auto border border-gray-300 mt-4 text-[15px]">
+    <thead>
+      <tr>
+        <th class="border border-gray-300 text-center">Customer Id</th>
+        <th class="border border-gray-300 text-center">Name</th>
+        <th class="border border-gray-300 text-center">Email</th>
+        <th class="border border-gray-300 text-center">Phone</th>
+        <th class="border border-gray-300 text-center">Address</th>
+        <th class="border border-gray-300 text-center">Gender</th>
+        <th class="border border-gray-300 text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let customer of filteredCustomers">
+        <td class="border border-gray-300 text-center">{{customer.id}}</td>
+        <td class="border border-gray-300 text-center">{{customer.name}}</td>
+        <td class="border border-gray-300 text-center">{{customer.email}}</td>
+        <td class="border border-gray-300 text-center">{{customer.phone}}</td>
+        <td class="border border-gray-300 text-center">{{customer.address}}</td>
+        <td class="border border-gray-300 text-center">{{customer.gender}}</td>
+        <td class="border border-gray-300 text-center">
+          <button (click)="viewCustomer(customer)" class="mr-5">
+            <img src="assets/eye.svg" alt="View icon" width="18" height="18" class="relative bottom-[-5px]">
+          </button>
+          <button (click)="editCustomer(customer)" class="mr-5">
+            <img src="assets/edit-user.svg" alt="Edit icon" width="18" height="18" class="relative bottom-[-5px]">
+          </button>
+          <button (click)="deleteCustomer(customer.id)">
+            <img src="assets/trash.svg" alt="Delete icon" width="18" height="18" class="relative bottom-[-5px]">
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Customer Detail Overlay -->
+  <app-customer-detail 
+    *ngIf="selectedCustomer" 
+    [customer]="selectedCustomer" 
+    (close)="closeOverlay()">
+  </app-customer-detail>
+
+</div>
