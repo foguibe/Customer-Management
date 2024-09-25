@@ -22,57 +22,62 @@ export interface Customer {
 export class CustomerService {
   private storageKey = 'customers';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  // Get all customers from localStorage and JSON
+  // Get all customers from sessionStorage and JSON
   getCustomers(): Observable<Customer[]> {
     return new Observable(observer => {
-      const customersFromLocalStorage = this.getCustomersFromLocalStorage();
+      const customersFromSessionStorage = this.getCustomersFromSessionStorage();
       this.http.get<Customer[]>('/assets/users.json').subscribe(jsonCustomers => {
-        const allCustomers = [...jsonCustomers, ...customersFromLocalStorage];
+        const allCustomers = [...jsonCustomers, ...customersFromSessionStorage];
         observer.next(allCustomers);
         observer.complete();
       });
     });
   }
 
-  // Get all customers from localStorage
-  private getCustomersFromLocalStorage(): Customer[] {
-    const customers = localStorage.getItem(this.storageKey);
-    return customers ? JSON.parse(customers) : [];
+  // Get all customers from sessionStorage
+  private getCustomersFromSessionStorage(): Customer[] {
+    if (typeof window !== 'undefined') {
+      const customers = sessionStorage.getItem(this.storageKey);
+      return customers ? JSON.parse(customers) : [];
+    }
+    return [];
   }
 
-  // Save customers to localStorage
+  // Save customers to sessionStorage
   saveCustomers(customers: Customer[]): void {
-    localStorage.setItem(this.storageKey, JSON.stringify(customers));
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(this.storageKey, JSON.stringify(customers));
+    }
   }
 
   private nextCustomerId: number = 11;
+
   // Add a new customer
   addCustomer(customer: Customer): void {
     customer.id = this.nextCustomerId++;
     customer.dateAdded = new Date();
-    const customers = this.getCustomersFromLocalStorage();
+    const customers = this.getCustomersFromSessionStorage();
     customers.push(customer);
     this.saveCustomers(customers);
   }
-  
 
   // Get a customer by ID
   getCustomerById(id: number): Customer | undefined {
-    const customers = this.getCustomersFromLocalStorage();
-    return customers.find(c => c.id === id); // Return the customer if found
+    const customers = this.getCustomersFromSessionStorage();
+    return customers.find(c => c.id === id);
   }
 
-  // Upload customer and compress image
+  // Upload customer with image compression
   uploadCustomer(customer: Customer, file: File): Promise<void> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = async () => {
-        const base64Image = reader.result as string;
         try {
-          const compressedImage = await this.compressImage(base64Image);
-          customer.picture = compressedImage;
+          const base64Image = reader.result as string;
+          const compressedImage = await this.compressImage(base64Image, 0.7); // Adjust the quality as needed
+          customer.picture = compressedImage; // Save the compressed base64 image
           this.addCustomer(customer);
           resolve();
         } catch (error) {
@@ -85,31 +90,34 @@ export class CustomerService {
       reader.readAsDataURL(file);
     });
   }
-  
-  // Compress image and return a Promise
-  compressImage(image: string): Promise<string> {
-    return new Promise((resolve) => {
+
+  // Compress image using canvas
+  private compressImage(imageDataUrl: string, quality: number): Promise<string> {
+    return new Promise((resolve, reject) => {
       const img = new Image();
-      img.src = image;
+      img.src = imageDataUrl;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        canvas.width = 100; // Set desired width
-        canvas.height = 100; // Set desired height
         const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const dataURL = canvas.toDataURL('image/jpeg', 0.5); // Compress image (0.5 is quality)
-          resolve(dataURL);
-        } else {
-          resolve(image); // Fallback if ctx is null
+        if (!ctx) {
+          reject('Canvas not supported');
+          return;
         }
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality); // Compress as JPEG
+        resolve(compressedDataUrl);
+      };
+      img.onerror = (error) => {
+        reject(error);
       };
     });
   }
 
   // Update an existing customer
   updateCustomer(updatedCustomer: Customer): void {
-    const customers = this.getCustomersFromLocalStorage();
+    const customers = this.getCustomersFromSessionStorage();
     const index = customers.findIndex(c => c.id === updatedCustomer.id);
     if (index !== -1) {
       customers[index] = updatedCustomer;
@@ -119,7 +127,7 @@ export class CustomerService {
 
   // Delete a customer by ID
   deleteCustomer(id: number): void {
-    const customers = this.getCustomersFromLocalStorage();
+    const customers = this.getCustomersFromSessionStorage();
     const updatedCustomers = customers.filter(c => c.id !== id);
     this.saveCustomers(updatedCustomers);
   }
