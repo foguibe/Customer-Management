@@ -8,11 +8,11 @@
       <span class="font-semibold text-gray-500">{{ selectedFile ? selectedFile.name : 'No profile image uploaded' }}</span>
       <div class="relative mt-2">
         <input type="file" (change)="onFileSelected($event)" id="file-upload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" autocomplete="off" />
-        <label for="file-upload" class="flex items-center justify-center border-[1px] border-red-700 p-2 cursor-pointer text-center text-[14px] font-bold hover:bg-slate-50">
+        <label for="file-upload" class="flex items-center justify-center border-[1px] border-red-700 p-2 cursor-pointer text-center text-[14px] font-bold hover:bg-slate-50 w-[200px]">
           {{ selectedFile && selectedFile.name.length > 20 ? selectedFile.name.slice(0, 20) + '...' : 'Choose a profile picture' }}
         </label>
       </div>
-      <button *ngIf="selectedFile" type="button" (click)="removeFile()" class="text-red-600 font-bold mt-1 text-left">
+      <button *ngIf="selectedFile" type="button" (click)="removeFile()" class="text-red-600 font-bold mt-2 text-left text-[14px]">
         ✖ Remove
       </button>
     </div>

@@ -47,14 +47,16 @@ export class CustomerService {
     localStorage.setItem(this.storageKey, JSON.stringify(customers));
   }
 
+  private nextCustomerId: number = 11;
   // Add a new customer
   addCustomer(customer: Customer): void {
-    const customers = this.getCustomersFromLocalStorage();
-    customer.id = customers.length + 1; // Ensure unique ID
+    customer.id = this.nextCustomerId++;
     customer.dateAdded = new Date();
+    const customers = this.getCustomersFromLocalStorage();
     customers.push(customer);
     this.saveCustomers(customers);
   }
+  
 
   // Get a customer by ID
   getCustomerById(id: number): Customer | undefined {
