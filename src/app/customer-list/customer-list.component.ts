@@ -13,14 +13,19 @@ import { HttpClientModule } from '@angular/common/http';
   styleUrls: ['./customer-list.component.css'],
   imports: [CustomerDetailComponent, FormsModule, CommonModule, HttpClientModule]
 })
+
 export class CustomerListComponent implements OnInit {
   customers: Customer[] = [];
   searchTerm: string = '';
   filterGender: string = '';
-  startDate: string = ''; 
-  endDate: string = '';    
+  startDate: string = '';
+  endDate: string = '';
   filteredCustomers: Customer[] = [];
   selectedCustomer: Customer | null = null;
+  
+  // New properties for table formatting
+  tableFontSize: number = 14;  // Default font size is 14px
+  textAlign: string = 'left';  // Default alignment is 'left'
 
   constructor(
     private customerService: CustomerService,
@@ -38,15 +43,6 @@ export class CustomerListComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.viewCustomerById(+id); // Call the method with the ID
-    }
-  }
-
-  viewCustomerById(id: number): void {
-    const customer = this.customerService.getCustomerById(id);
-    if (customer) {
-      this.selectedCustomer = customer;
-    } else {
-      this.router.navigate(['/customers']); // Navigate back if customer not found
     }
   }
 
@@ -93,7 +89,14 @@ export class CustomerListComponent implements OnInit {
   closeOverlay(): void {
     this.selectedCustomer = null;
     this.router.navigate(['/customers']); // Navigate back to the customer list
-  }  
+  }
+
+  viewCustomerById(id: number): void {
+    const customer = this.customers.find(c => c.id === id);
+    if (customer) {
+      this.viewCustomer(customer);
+    }
+  }
 
   editCustomer(customer: Customer): void {
     // Logic for editing the customer

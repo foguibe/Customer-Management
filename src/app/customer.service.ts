@@ -49,17 +49,11 @@ export class CustomerService {
 
   // Add a new customer
   addCustomer(customer: Customer): void {
-    this.getCustomers().subscribe(allCustomers => {
-      // Calculate the next ID based on both local storage and JSON customers
-      const maxId = allCustomers.reduce((max, customer) => customer.id > max ? customer.id : max, 0);
-      customer.id = maxId + 1; // Ensure unique ID starting from 11
-      customer.dateAdded = new Date();
-
-      // Add to local storage
-      const customersFromLocalStorage = this.getCustomersFromLocalStorage();
-      customersFromLocalStorage.push(customer);
-      this.saveCustomers(customersFromLocalStorage);
-    });
+    const customers = this.getCustomersFromLocalStorage();
+    customer.id = customers.length + 1; // Ensure unique ID
+    customer.dateAdded = new Date();
+    customers.push(customer);
+    this.saveCustomers(customers);
   }
 
   // Get a customer by ID
