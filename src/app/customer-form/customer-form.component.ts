@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CustomerService, Customer } from '../customer.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-customer-form',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, HttpClientModule],
   templateUrl: './customer-form.component.html'
 })
 export class CustomerFormComponent implements OnInit {
@@ -17,7 +18,10 @@ export class CustomerFormComponent implements OnInit {
     email: '',
     phone: '',
     address: '',
+    zipcode: '',
     gender: 'male',
+    website: '',
+    company: '',
     picture: '',
     dateAdded: new Date()
   };

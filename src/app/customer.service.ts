@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 export interface Customer {
   id: number;
@@ -8,6 +10,9 @@ export interface Customer {
   address: string;
   gender: string;
   picture: string; // This will store the base64-encoded image string
+  zipcode: string;
+  website: string;
+  company: string;
   dateAdded: Date;
 }
 
@@ -17,10 +22,22 @@ export interface Customer {
 export class CustomerService {
   private storageKey = 'customers';
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
+
+  // Get all customers from localStorage and JSON
+  getCustomers(): Observable<Customer[]> {
+    return new Observable(observer => {
+      const customersFromLocalStorage = this.getCustomersFromLocalStorage();
+      this.http.get<Customer[]>('/assets/users.json').subscribe(jsonCustomers => {
+        const allCustomers = [...jsonCustomers, ...customersFromLocalStorage];
+        observer.next(allCustomers);
+        observer.complete();
+      });
+    });
+  }
 
   // Get all customers from localStorage
-  getCustomers(): Customer[] {
+  private getCustomersFromLocalStorage(): Customer[] {
     const customers = localStorage.getItem(this.storageKey);
     return customers ? JSON.parse(customers) : [];
   }
@@ -32,16 +49,22 @@ export class CustomerService {
 
   // Add a new customer
   addCustomer(customer: Customer): void {
-    const customers = this.getCustomers();
-    customer.id = customers.length + 1; // Ensure unique ID
-    customer.dateAdded = new Date();
-    customers.push(customer);
-    this.saveCustomers(customers);
+    this.getCustomers().subscribe(allCustomers => {
+      // Calculate the next ID based on both local storage and JSON customers
+      const maxId = allCustomers.reduce((max, customer) => customer.id > max ? customer.id : max, 0);
+      customer.id = maxId + 1; // Ensure unique ID starting from 11
+      customer.dateAdded = new Date();
+
+      // Add to local storage
+      const customersFromLocalStorage = this.getCustomersFromLocalStorage();
+      customersFromLocalStorage.push(customer);
+      this.saveCustomers(customersFromLocalStorage);
+    });
   }
 
   // Get a customer by ID
   getCustomerById(id: number): Customer | undefined {
-    const customers = this.getCustomers();
+    const customers = this.getCustomersFromLocalStorage();
     return customers.find(c => c.id === id); // Return the customer if found
   }
 
@@ -90,7 +113,7 @@ export class CustomerService {
 
   // Update an existing customer
   updateCustomer(updatedCustomer: Customer): void {
-    const customers = this.getCustomers();
+    const customers = this.getCustomersFromLocalStorage();
     const index = customers.findIndex(c => c.id === updatedCustomer.id);
     if (index !== -1) {
       customers[index] = updatedCustomer;
@@ -100,7 +123,7 @@ export class CustomerService {
 
   // Delete a customer by ID
   deleteCustomer(id: number): void {
-    const customers = this.getCustomers();
+    const customers = this.getCustomersFromLocalStorage();
     const updatedCustomers = customers.filter(c => c.id !== id);
     this.saveCustomers(updatedCustomers);
   }

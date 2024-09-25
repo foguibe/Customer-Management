@@ -4,13 +4,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CustomerDetailComponent } from '../customer-detail/customer-detail.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-customer-list',
   standalone: true,
   templateUrl: './customer-list.component.html',
   styleUrls: ['./customer-list.component.css'],
-  imports: [CustomerDetailComponent, FormsModule, CommonModule]
+  imports: [CustomerDetailComponent, FormsModule, CommonModule, HttpClientModule]
 })
 export class CustomerListComponent implements OnInit {
   customers: Customer[] = [];
@@ -28,8 +29,10 @@ export class CustomerListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.customers = this.customerService.getCustomers();
-    this.filterCustomers();
+    this.customerService.getCustomers().subscribe(customers => {
+      this.customers = customers;
+      this.filterCustomers();
+    });
 
     // Check if there's a customer ID in the route
     const id = this.route.snapshot.paramMap.get('id');
