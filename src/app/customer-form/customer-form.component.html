@@ -8,7 +8,7 @@
       <span class="font-semibold text-gray-500">{{ selectedFile ? selectedFile.name : 'No profile image uploaded' }}</span>
       <div class="relative mt-2">
         <input type="file" (change)="onFileSelected($event)" id="file-upload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" autocomplete="off" />
-        <label for="file-upload" class="flex items-center justify-center border border-red-700 p-2 cursor-pointer text-center text-[14px] font-bold">
+        <label for="file-upload" class="flex items-center justify-center border-[1px] border-red-700 p-2 cursor-pointer text-center text-[14px] font-bold hover:bg-slate-50">
           {{ selectedFile && selectedFile.name.length > 20 ? selectedFile.name.slice(0, 20) + '...' : 'Choose a profile picture' }}
         </label>
       </div>
@@ -64,5 +64,5 @@
       <input [(ngModel)]="customer.company" name="company" placeholder="Enter comapny name" class="px-3 py-2 text-[14px] w-full outline-none" autocomplete="off" />
     </fieldset>
   </div>
-  <button type="submit" class="px-16 py-2 border-[2px] border-blue-950 text-black rounded-[1px] font-bold text-[15px] w-fit m-auto mt-10">Upload Details</button>
+  <button type="submit" class="px-16 py-2 border-[2px] border-blue-950 text-black rounded-[1px] font-bold text-[15px] w-fit m-auto mt-10 hover:bg-slate-100 active:bg-white">Upload Details</button>
 </form>
