@@ -1,9 +1,27 @@
 <div class="p-4">
-  <div class="flex justify-between mb-4 border-b-[1px] border-b-gray-300 pb-2">
+  <div class="flex justify-between mb-4 border-b-[1px] border-b-gray-300 pb-2 flex-wrap gap-y-5">
     <div>
       <input [(ngModel)]="searchTerm" (ngModelChange)="filterCustomers()" class="p-2 border border-gray-400 rounded-[2px] text-[14px] outline-none" placeholder="Search..." />
       <p class="text-[14px] text-gray-500 mt-1">Search by name, email, phone, or address.</p>
     </div>
+
+    <div class="flex flex-col">
+      <div class="flex items-center">
+        <input 
+        [(ngModel)]="searchId" 
+        (ngModelChange)="clearFilters()" 
+        class="p-2 border border-gray-400 rounded-[2px] text-[14px] outline-none" 
+        placeholder="Enter specific id..." 
+      />
+      <button 
+        (click)="searchCustomerById()" 
+        class="p-2 bg-blue-900 text-white rounded-[2px] text-[14px] font-bold ml-2">
+        Search
+      </button>
+      </div>
+      <p class="text-[14px] text-gray-500 mt-1">Search by customer id.</p>
+    </div>
+    
 
     <div class="flex items-center gap-3">
       <p class="font-bold">Filter by: </p>

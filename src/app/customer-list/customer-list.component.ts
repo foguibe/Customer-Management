@@ -17,12 +17,13 @@ import { HttpClientModule } from '@angular/common/http';
 export class CustomerListComponent implements OnInit {
   customers: Customer[] = [];
   searchTerm: string = '';
+  searchId: string = ''; // New property for searching by ID
   filterGender: string = '';
   startDate: string = '';
   endDate: string = '';
   filteredCustomers: Customer[] = [];
   selectedCustomer: Customer | null = null;
-  
+
   // New properties for table formatting
   tableFontSize: number = 14;  // Default font size is 14px
   textAlign: string = 'left';  // Default alignment is 'left'
@@ -46,6 +47,20 @@ export class CustomerListComponent implements OnInit {
     }
   }
 
+  searchCustomerById(): void {
+    if (this.searchId) {
+      const id = parseInt(this.searchId, 10);
+      const customer = this.customers.find(c => c.id === id);
+      if (customer) {
+        this.filteredCustomers = [customer]; // Show only the found customer
+      } else {
+        this.filteredCustomers = []; // No customer found
+      }
+    } else {
+      this.filterCustomers(); // Reset the filter if search ID is empty
+    }
+  }
+  
   filterCustomers(): void {
     this.filteredCustomers = this.customers.filter(customer => {
       const matchesSearch = this.searchTerm
