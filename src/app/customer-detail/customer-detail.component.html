@@ -4,7 +4,7 @@
       <div *ngIf="customer?.picture">
         <img [src]="customer?.picture" alt="{{customer?.name}}'s picture" class="rounded-[1px] w-[120px] h-[100px] mb-4" />
       </div>
-      <h2>{{customer?.name}}</h2>
+      <h2 class="font-bold text-[20px] mb-3 text-blue-950">{{customer?.name}}</h2>
       <p><strong>Email:</strong> {{customer?.email}}</p>
       <p><strong>Phone:</strong> {{customer?.phone}}</p>
       <p><strong>Address:</strong> {{customer?.address}}</p>
